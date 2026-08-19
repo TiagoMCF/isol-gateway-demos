@@ -27,6 +27,7 @@ jobs:
             -H "Authorization: Bearer $ISOL_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$BODY" | jq -r '.choices[0].message.content')
+          echo "$REVIEW"
           echo "## 🤖 AI review — served by a sovereign gateway" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "$REVIEW" >> "$GITHUB_STEP_SUMMARY"
