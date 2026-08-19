@@ -1,0 +1,34 @@
+name: AI review (sovereign gateway)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+
+      - name: Ask the gateway to review the change
+        env:
+          ISOL_API_KEY: ${{ secrets.ISOL_API_KEY }}
+        run: |
+          DIFF=$(git diff HEAD~1 2>/dev/null || git show --stat HEAD; git show HEAD | head -120)
+          BODY=$(jq -n --arg diff "$DIFF" '{
+            model: "isol-4.9",
+            messages: [
+              {role:"system", content:"You are a strict code reviewer. Reply in GitHub-flavored markdown: 2-4 bullet findings, then a one-line verdict."},
+              {role:"user", content:("Review this change:\n```diff\n" + $diff + "\n```")}
+            ]
+          }')
+          REVIEW=$(curl -s https://tokens.4clouders.com/v1/chat/completions \
+            -H "Authorization: Bearer $ISOL_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" | jq -r '.choices[0].message.content')
+          echo "## 🤖 AI review — served by a sovereign gateway" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "$REVIEW" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "_Model: isol-4.9 · endpoint: tokens.4clouders.com — the diff never left a channel we don'"'"'t control._" >> "$GITHUB_STEP_SUMMARY"
