@@ -31,4 +31,4 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "$REVIEW" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "_Model: isol-4.9 · endpoint: tokens.4clouders.com — the diff never left a channel we don'"'"'t control._" >> "$GITHUB_STEP_SUMMARY"
+          echo "_Model: isol-4.9 · endpoint: tokens.4clouders.com — the diff never left a channel we do not control._" >> "$GITHUB_STEP_SUMMARY"
