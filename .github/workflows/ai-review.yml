@@ -1,4 +1,4 @@
-name: AI review (sovereign gateway)
+name: AI review (iSol API)
 on:
   push:
     branches: [main]
@@ -19,7 +19,7 @@ jobs:
           BODY=$(jq -n --arg diff "$DIFF" '{
             model: "isol-4.9",
             messages: [
-              {role:"system", content:"You are a strict code reviewer. Reply in GitHub-flavored markdown: 2-4 bullet findings, then a one-line verdict."},
+              {role:"system", content:"You are a strict code reviewer. If the diff exposes a secret or password, start with **SECURITY:** and say which line. Reply in GitHub-flavored markdown: 2-4 bullet findings, then a one-line verdict."},
               {role:"user", content:("Review this change:\n```diff\n" + $diff + "\n```")}
             ]
           }')
@@ -28,8 +28,8 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$BODY" | jq -r '.choices[0].message.content')
           echo "$REVIEW"
-          echo "## 🤖 AI review — served by a sovereign gateway" >> "$GITHUB_STEP_SUMMARY"
+          echo "## 🤖 AI review · iSol API" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "$REVIEW" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "_Model: isol-4.9 · endpoint: tokens.4clouders.com — the diff never left a channel we do not control._" >> "$GITHUB_STEP_SUMMARY"
+          echo "_Model: isol-4.9 · endpoint: tokens.4clouders.com/v1 · one key per repo, with its own spending cap._" >> "$GITHUB_STEP_SUMMARY"
